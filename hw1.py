@@ -45,15 +45,17 @@ def runSW(inputFile, scoreFile, openGap, extGap):
 
 	# Sequence 1 is the cols
 	# Sequence 2 is the rows
-	print("seq2" , seq2)
-	print("seq1", seq1)
+	# print("seq2" , seq2)
+	# print("seq1", seq1)
 
 	sub_mat = np.loadtxt(scoreFile, skiprows=1, usecols=tuple(range(1, SUBSTITUTION_MAT_NUM_COLS)))
 	sub_mat = pd.DataFrame(sub_mat, columns=SUBSTITUTION_MAT_NAMES, index=SUBSTITUTION_MAT_NAMES)
 	
-	np.set_printoptions(threshold=sys.maxsize)
+	scoring_mat = np.zeros((len(seq2) + 1, len(seq1) + 1), dtype=np.int32)
+	traceback_mat = np.zeros((len(seq2) + 1, len(seq1) + 1), dtype=np.int32)
 
-	scoring_mat = np.zeros((len(seq2) + 1, len(seq1) + 1))
+	LEFT, DIAGONAL, UP = range(3)
+
 	def calculateGapPenalty(opening_penalty, extension_penalty, length):
 		return opening_penalty + (extension_penalty * (length - 1))
 
@@ -63,32 +65,37 @@ def runSW(inputFile, scoreFile, openGap, extGap):
 
 			# diagonal score
 			diag_score = scoring_mat[i - 1, j -1] + sub_mat.loc[seq2[i - 1], seq1[j - 1]]
-			
+			diag_score = (diag_score, DIAGONAL)
 
 			# vertical score
 			vert_score_with_new_gaps = scoring_mat[:i, j] + [calculateGapPenalty(openGap, extGap, length) for length in range(i, 0, -1)]
 			if vert_score_with_new_gaps.size != 0:
-				max_vert_score = max(scoring_mat[:i, j] + [calculateGapPenalty(openGap, extGap, length) for length in range(i, 0, -1)])	
+				max_vert_score = max(scoring_mat[:i, j] + [calculateGapPenalty(openGap, extGap, length) for length in range(i, 0, -1)])
+				max_vert_score = (max_vert_score, UP)
 			else:
-				max_vert_score = 0
+				max_vert_score = (0, UP)
 			
 			# horizontal score
 			horz_score_with_new_gaps = scoring_mat[i, :j] + [calculateGapPenalty(openGap, extGap, length) for length in range(j, 0, -1)]
 			if horz_score_with_new_gaps.size != 0:
-				max_horz_score = max(scoring_mat[i, :j] + [calculateGapPenalty(openGap, extGap, length) for length in range(j, 0, -1)])	
+				max_horz_score = max(scoring_mat[i, :j] + [calculateGapPenalty(openGap, extGap, length) for length in range(j, 0, -1)])
+				max_horz_score = (max_horz_score, LEFT)
 			else:
-				max_horz_score = 0
+				max_horz_score = (0, LEFT)
 
 			# find overall max
 			# print("[diag_score, max_vert_score, max_horz_score, 0]", (seq2[i - 1], seq1[j - 1], [diag_score, max_vert_score, max_horz_score, 0]))
-			scoring_mat[i, j] = max([diag_score, max_vert_score, max_horz_score, 0])
+			scoring_mat[i, j], traceback_mat[i, j] = max([max_horz_score, diag_score, max_vert_score, (0, 0)])
 
+
+	with open("smaple-traceback-example.txt", "w+") as testout:
+		np.savetxt(testout, traceback_mat, fmt="%d", delimiter=" ")
 
 	# backtrack time
 	alignment_score = np.amax(scoring_mat)
 	xTrace, yTrace = np.unravel_index(np.argmax(scoring_mat, axis=None), scoring_mat.shape)
-	print("maxs" , (alignment_score, xTrace, yTrace))
-	print("scoring_mat", scoring_mat[xTrace, yTrace])
+	# print("maxs" , (alignment_score, xTrace, yTrace))
+	# print("scoring_mat", scoring_mat[xTrace, yTrace])
 
 	initXTrace = xTrace
 	initYTrace = yTrace
@@ -111,32 +118,22 @@ def runSW(inputFile, scoreFile, openGap, extGap):
 		yTrace -= 1
 		xTrace -= 1
 
-	score_up = scoring_mat[xTrace - 1, yTrace]
-	score_diag = scoring_mat[xTrace - 1, yTrace - 1]
-	score_left = scoring_mat[xTrace, yTrace - 1]
-
 	lastAlignIdx = 0
 
-	while score_up != 0 or score_diag != 0 or score_left != 0:
+	while scoring_mat[xTrace, yTrace] != 0 and (xTrace, yTrace) != (0,0):
 
-		# trace_options = [score_up, score_diag, score_left]
-		# trace_options = [score_up, score_left, score_diag]
-		# trace_options = [score_diag, score_up, score_left]
-		trace_options = [score_diag, score_left, score_up]
-		# trace_options = [score_left, score_diag, score_up]
-		# trace_options = [score_left, score_up, score_diag]
+		trace_max_idx = traceback_mat[xTrace, yTrace]
 
-		trace_max_idx = trace_options.index(max(trace_options))
 		lastAlignIdx = trace_max_idx
 		# go up: gap in seq1
-		if trace_max_idx == 2:
+		if trace_max_idx == UP:
 			seq2_align = seq2[xTrace - 1] + seq2_align
 			seq1_align = "-" + seq1_align
 			seq_identity = " " + seq_identity
 			xTrace -= 1
 
 		# go diagonal
-		elif trace_max_idx == 0:
+		elif trace_max_idx == DIAGONAL:
 			if seq1[yTrace - 1] == seq2[xTrace - 1]:
 				seq2_align = seq2[xTrace - 1] + seq2_align
 				seq1_align = seq1[yTrace - 1] + seq1_align
@@ -151,39 +148,34 @@ def runSW(inputFile, scoreFile, openGap, extGap):
 				xTrace -= 1
 
 		# go left: gap in seq2
-		elif trace_max_idx == 1:
+		elif trace_max_idx == LEFT:
 			seq2_align = "-" + seq2_align
 			seq1_align = seq1[yTrace - 1] + seq1_align 
 			seq_identity = " " + seq_identity
 			yTrace -= 1
 
-		print(trace_options)
-		print("score_diag" , ((xTrace - 1, yTrace - 1), score_diag))
-		print("score_left" , ((xTrace, yTrace - 1), score_left))
-		print("score_up" , ((xTrace - 1, yTrace), score_up))
-		print("seq2", seq2_align)
-		print("mid1", seq_identity)
-		print("seq1", seq1_align)
-		print("\n\n")
+	# 	print(trace_max_idx)
+	# 	print("seq1", seq1_align)
+	# 	print("mid1", seq_identity)
+	# 	print("seq2", seq2_align)
+	# 	print("(xTrace, yTrace)", (xTrace, yTrace))
+	# 	print("(scoring_mat[xTrace, yTrace])", scoring_mat[xTrace, yTrace])
 
+	# 	print("\n\n")
 
-		score_up = scoring_mat[xTrace - 1, yTrace]
-		score_diag = scoring_mat[xTrace - 1, yTrace - 1]
-		score_left = scoring_mat[xTrace, yTrace - 1]
-
-	print("final xtrace", xTrace)
-	print("final ytrace", yTrace)
-	print("init xtrace", initXTrace)
-	print("init ytrace", initYTrace)
-	print("trace_max_idx", trace_max_idx)
+	# print("final xtrace", xTrace)
+	# print("final ytrace", yTrace)
+	# print("init xtrace", initXTrace)
+	# print("init ytrace", initYTrace)
+	# print("trace_max_idx", trace_max_idx)
 	# figure out which seq is longer and add in the parantheses
 	seq2_align = "(" + seq2_align + ")"
 	seq1_align = "(" + seq1_align + ")"
 
 	if trace_max_idx == 1:
 		seq1_align = seq1[:yTrace] + seq1_align + seq1[initYTrace:]
-		seq2_align = " " * (len(seq1[:yTrace]) - 1) + seq2[:xTrace] + seq2_align + seq2[initXTrace:]
-		seq_identity = " " * max([xTrace, yTrace]) + seq_identity + " " * max([len(seq1) - initYTrace, len(seq2) - initXTrace])
+		seq2_align = " " * (len(seq1[:yTrace])) + seq2[:xTrace] + seq2_align + seq2[initXTrace:]
+		seq_identity = " " * (max([xTrace, yTrace]) + 1) + seq_identity + " " * max([len(seq1) - initYTrace, len(seq2) - initXTrace])
 		# print("max([len(seq1) - initYTrace, len(seq2) - initXTrace]", max([len(seq1) - initYTrace, len(seq2) - initXTrace]))
 	elif trace_max_idx == 2:
 		seq1_align = seq1[:yTrace] + seq1_align + seq1[initYTrace - 1:]
@@ -254,3 +246,4 @@ def runSW(inputFile, scoreFile, openGap, extGap):
 
 ### Run your Smith-Waterman Algorithm
 runSW(args.input, args.score, int(args.opengap), int(args.extgap))
+
