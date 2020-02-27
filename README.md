@@ -25,7 +25,7 @@ It should install all dependencies for you too! I'd create a [virtualenv](https:
 
 ## How to Use
 
-There are a few required inputs, and a couple more optional ones descrbed below. In keeping with the skeleton code under which this program was developed, run the program as a module: 
+There are a few required inputs, and a couple more optional ones described below. In keeping with the skeleton code under which this program was developed, run the program as a module: 
 
 ```
 python -m naivesw.hw1 -i input.txt -s score.txt -t output.txt
