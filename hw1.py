@@ -22,6 +22,7 @@ import StringIO
 ### We need to read input file and score file.
 parser = argparse.ArgumentParser(description='Smith-Waterman Algorithm')
 parser.add_argument('-i', '--input', help='input file', required=True)
+parser.add_argument('-t', '--output', help='output file', required=True)
 parser.add_argument('-s', '--score', help='score file', required=True)
 parser.add_argument('-o', '--opengap', help='open gap', required=False, default=-2)
 parser.add_argument('-e', '--extgap', help='extension gap', required=False, default=-1)
@@ -31,7 +32,7 @@ SUBSTITUTION_MAT_NUM_COLS = 24
 SUBSTITUTION_MAT_NAMES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "K", "L", "M", "N", "P", "Q", "R", "S", "T", "V", "W", "X", "Y", "Z"] 
 
 ### Implement your Smith-Waterman Algorithm
-def runSW(inputFile, scoreFile, openGap, extGap):
+def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 	### Print input and score file names. You can comment these out.
 	print ("input file : %s" % inputFile)
 	print ("score file : %s" % scoreFile)
@@ -193,9 +194,7 @@ def runSW(inputFile, scoreFile, openGap, extGap):
 	seq_identity = [seq_identity[i:i+n] for i in range(0, len(seq_identity), n)]
 
 	# Write out the sequences, score matrix, sequences alignment in human-readable form, and score
-	# OUTPUT_FILE = "test_output_mat.txt"
-	OUTPUT_FILE = "output.txt"
-	with open(OUTPUT_FILE, "w+") as out:
+	with open(outputFile, "w+") as out:
 
 		# write out sequences
 		out.write('----------------------------------------------------\n')
@@ -245,5 +244,5 @@ def runSW(inputFile, scoreFile, openGap, extGap):
 
 
 ### Run your Smith-Waterman Algorithm
-runSW(args.input, args.score, int(args.opengap), int(args.extgap))
+runSW(args.input, args.output, args.score, int(args.opengap), int(args.extgap))
 
