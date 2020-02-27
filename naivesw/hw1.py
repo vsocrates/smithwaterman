@@ -163,7 +163,7 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 
 		seq_identity = " " * max([xTrace, yTrace]) + seq_identity + " " * max([len(seq1) - initYTrace, len(seq2) - initXTrace])
 
-	n = 100
+	n = 75
 	seq1_align = [seq1_align[i:i+n] for i in range(0, len(seq1_align), n)]
 	seq2_align = [seq2_align[i:i+n] for i in range(0, len(seq2_align), n)]
 	seq_identity = [seq_identity[i:i+n] for i in range(0, len(seq_identity), n)]
