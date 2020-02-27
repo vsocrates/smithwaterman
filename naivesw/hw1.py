@@ -96,6 +96,7 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 	seq1_align = ""
 	seq_identity = ""
 
+	# add on the first (max) string of the sequences
 	if seq1[yTrace - 1] == seq2[xTrace - 1]:
 		seq2_align = seq2[xTrace - 1] + seq2_align
 		seq1_align = seq1[yTrace - 1] + seq1_align
@@ -110,6 +111,7 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 		yTrace -= 1
 		xTrace -= 1
 
+	# loop until we end up at a 0, or we get back to the origin
 	while scoring_mat[xTrace, yTrace] != 0 and (xTrace, yTrace) != (0,0):
 
 		trace_max_idx = traceback_mat[xTrace, yTrace]
@@ -145,6 +147,7 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 	seq2_align = "(" + seq2_align + ")"
 	seq1_align = "(" + seq1_align + ")"
 
+	# add on the trailing (unaligned) ends of both sequences
 	if trace_max_idx == 1:
 		if len(seq1) > len(seq2):
 			seq1_align = seq1[:yTrace] + seq1_align + seq1[initYTrace:]
@@ -168,6 +171,7 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 
 		seq_identity = " " * max([xTrace, yTrace]) + seq_identity + " " * max([len(seq1) - initYTrace, len(seq2) - initXTrace])
 
+	# split up the sequence strings so we can print on multiple lines
 	n = 100
 	seq1_align = [seq1_align[i:i+n] for i in range(0, len(seq1_align), n)]
 	seq2_align = [seq2_align[i:i+n] for i in range(0, len(seq2_align), n)]
