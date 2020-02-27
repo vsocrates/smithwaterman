@@ -1,11 +1,12 @@
 ----------------------------------------------------
-|	Sequences                                   |
+|	Sequences                                       |
 ----------------------------------------------------
 
 sequence1	MGLSDGEWQLVLNVWGKVEADIPGHGQEVLIRLFKGHPETLEKFDKFKHLKSEDEMKASEDLKKHGATVLTALGGILKKKGHHEAEIKPLAQSHATKHKIPVKYLEFISECIIQVLQSKHPGDFGADAQGAMNKALELFRKDMASNYKELGFQG
 sequence2	VLKCWGPMEADYATHGGLVLTRLFTEHPETLKLFPKFAGIAHGDLAGDAGVSAHGATVLNKLGDLLKARGAHAALLKPLSSSHATKHKIPIINFKLIAEVIGKVMEEKAG
+
 ----------------------------------------------------
-|	Score Matrix                                |
+|	Score Matrix                                    |
 ----------------------------------------------------
 
 		M	G	L	S	D	G	E	W	Q	L	V	L	N	V	W	G	K	V	E	A	D	I	P	G	H	G	Q	E	V	L	I	R	L	F	K	G	H	P	E	T	L	E	K	F	D	K	F	K	H	L	K	S	E	D	E	M	K	A	S	E	D	L	K	K	H	G	A	T	V	L	T	A	L	G	G	I	L	K	K	K	G	H	H	E	A	E	I	K	P	L	A	Q	S	H	A	T	K	H	K	I	P	V	K	Y	L	E	F	I	S	E	C	I	I	Q	V	L	Q	S	K	H	P	G	D	F	G	A	D	A	Q	G	A	M	N	K	A	L	E	L	F	R	K	D	M	A	S	N	Y	K	E	L	G	F	Q	G	
@@ -122,14 +123,14 @@ A	0	0	1	1	3	5	6	7	5	7	8	7	6	7	8	6	7	13	18	23	28	26	25	24	24	22	22	21	26	27	26	26
 G	0	0	6	4	3	4	11	9	8	7	6	5	5	6	6	6	12	12	17	22	26	27	25	24	30	28	28	26	25	25	25	25	27	28	29	34	41	39	39	44	44	44	48	53	52	53	54	53	54	53	56	61	65	70	73	78	78	82	87	89	87	89	88	93	94	95	102	105	105	105	108	108	113	115	122	129	127	128	133	135	138	145	143	148	153	157	160	164	169	169	171	175	175	175	182	187	193	199	208	214	219	227	231	236	236	239	245	244	249	250	255	255	256	259	261	264	267	270	271	277	276	276	283	281	280	280	278	277	276	275	279	277	276	275	274	273	272	271	270	269	268	267	266	265	266	268	266	265	264	263	262	267	265	264	264	
 
 ----------------------------------------------------
-|	Best Local Alignment                         |
+|	Best Local Alignment                            |
 ----------------------------------------------------
 
 Alignment Score:	283
-MGLSDGEWQL(VLNVWGKVEADIPGHGQEVLIRLFKGHPETLEK-FDKF---KHLKSEDEMKASED--LKKHGATVLTALGGILKKKGHHEAEIKPLAQS
+MGLSDGEWQL(VLNVWGKVEADIPGHGQEVLIRLFKGHPETLEK-FDKFK---HLKSEDEMKASED--LKKHGATVLTALGGILKKKGHHEAEIKPLAQS
            ||  ||  |||   ||  || |||  ||||| | | ||    |    |   |  |     ||||||  ||  ||  | | |  |||  |
           (VLKCWGPMEADYATHGGLVLTRLFTEHPETL-KLFPKFAGIAH--G-D-L-AG-DAGVSAHGATVLNKLGDLLKARGAHAALLKPLSSS
 HATKHKIPVKYLEF--ISECII-QVLQSKHPG)DFGADAQGAMNKALELFRKDMASNYKELGFQG
-||||||||     |  | |  |  |   |  |
+||||||||     |  | |  |  |   |  |                                
 HATKHKIPI--INFKLIAE-VIGKVMEEK-AG)
 
