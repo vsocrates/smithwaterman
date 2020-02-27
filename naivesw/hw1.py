@@ -17,6 +17,7 @@ import numpy as np
 import pandas as pd
 import sys 
 import StringIO
+import itertools
 
 ### This is one way to read in arguments in Python.
 ### We need to read input file and score file.
@@ -109,13 +110,9 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 		yTrace -= 1
 		xTrace -= 1
 
-	lastAlignIdx = 0
-
 	while scoring_mat[xTrace, yTrace] != 0 and (xTrace, yTrace) != (0,0):
 
 		trace_max_idx = traceback_mat[xTrace, yTrace]
-
-		lastAlignIdx = trace_max_idx
 		# go up: gap in seq1
 		if trace_max_idx == UP:
 			seq2_align = seq2[xTrace - 1] + seq2_align
@@ -149,10 +146,18 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 	seq1_align = "(" + seq1_align + ")"
 
 	if trace_max_idx == 1:
-		seq1_align = seq1[:yTrace] + seq1_align + seq1[initYTrace:]
-		seq2_align = " " * (len(seq1[:yTrace])) + seq2[:xTrace] + seq2_align + seq2[initXTrace:]
-		seq_identity = " " * (max([xTrace, yTrace]) + 1) + seq_identity + " " * max([len(seq1) - initYTrace, len(seq2) - initXTrace])
-		# print("max([len(seq1) - initYTrace, len(seq2) - initXTrace]", max([len(seq1) - initYTrace, len(seq2) - initXTrace]))
+		if len(seq1) > len(seq2):
+			seq1_align = seq1[:yTrace] + seq1_align + seq1[initYTrace:]
+			seq2_align = " " * (len(seq1[:yTrace])) + seq2[:xTrace] + seq2_align + seq2[initXTrace:]
+			seq_identity = " " * (max([xTrace, yTrace]) + 1) + seq_identity + " " * max([len(seq1) - initYTrace, len(seq2) - initXTrace])
+		elif len(seq2) > len(seq1):
+			seq1_align = " " * (len(seq2[:xTrace]) - 1) + seq1[:yTrace] + seq1_align + seq1[initYTrace:]
+			seq2_align = seq2[:xTrace] + seq2_align + seq2[initXTrace:]
+			seq_identity = " " * (max([xTrace, yTrace]) + 1) + seq_identity + " " * max([len(seq1) - initYTrace, len(seq2) - initXTrace])
+		else:
+			seq1_align = seq1[:yTrace] + seq1_align + seq1[initYTrace:]
+			seq2_align = " " * (len(seq1[:yTrace])) + seq2[:xTrace] + seq2_align + seq2[initXTrace:]
+			seq_identity = " " * (max([xTrace, yTrace]) + 1) + seq_identity + " " * max([len(seq1) - initYTrace, len(seq2) - initXTrace])
 	elif trace_max_idx == 2:
 		seq1_align = seq1[:yTrace] + seq1_align + seq1[initYTrace - 1:]
 		seq2_align = seq2[:xTrace] + seq2_align + seq2[initXTrace:]
@@ -163,7 +168,7 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 
 		seq_identity = " " * max([xTrace, yTrace]) + seq_identity + " " * max([len(seq1) - initYTrace, len(seq2) - initXTrace])
 
-	n = 75
+	n = 100
 	seq1_align = [seq1_align[i:i+n] for i in range(0, len(seq1_align), n)]
 	seq2_align = [seq2_align[i:i+n] for i in range(0, len(seq2_align), n)]
 	seq_identity = [seq_identity[i:i+n] for i in range(0, len(seq_identity), n)]
@@ -210,14 +215,14 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 
 		out.write("Alignment Score:\t" + str(alignment_score) + "\n")
 
-		for seq1, seq_iden, seq2 in zip(seq1_align, seq_identity, seq2_align):
+		for seq1, seq_iden, seq2 in itertools.izip_longest(seq1_align, seq_identity, seq2_align, fillvalue=''):
 			out.write(seq1 + "\n")
 			out.write(seq_iden + "\n")
 			out.write(seq2 + "\n")
 
 		out.write("\n")
 
-
+	print("\nWritten to {}!\n".format(outputFile))
 ### Run your Smith-Waterman Algorithm
 runSW(args.input, args.output, args.score, int(args.opengap), int(args.extgap))
 
