@@ -33,7 +33,7 @@ SUBSTITUTION_MAT_NAMES = ["A", "B", "C", "D", "E", "F", "G", "H", "I", "K", "L",
 
 ### Implement your Smith-Waterman Algorithm
 def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
-	### Print input and score file names. You can comment these out.
+	### Print input and score file names. 
 	print ("input file : %s" % inputFile)
 	print ("score file : %s" % scoreFile)
 	print ("open gap penalty : %s" % openGap)
@@ -46,9 +46,6 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 
 	# Sequence 1 is the cols
 	# Sequence 2 is the rows
-	# print("seq2" , seq2)
-	# print("seq1", seq1)
-
 	sub_mat = np.loadtxt(scoreFile, skiprows=1, usecols=tuple(range(1, SUBSTITUTION_MAT_NUM_COLS)))
 	sub_mat = pd.DataFrame(sub_mat, columns=SUBSTITUTION_MAT_NAMES, index=SUBSTITUTION_MAT_NAMES)
 	
@@ -85,18 +82,11 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 				max_horz_score = (0, LEFT)
 
 			# find overall max
-			# print("[diag_score, max_vert_score, max_horz_score, 0]", (seq2[i - 1], seq1[j - 1], [diag_score, max_vert_score, max_horz_score, 0]))
 			scoring_mat[i, j], traceback_mat[i, j] = max([max_horz_score, diag_score, max_vert_score, (0, 0)])
-
-
-	with open("smaple-traceback-example.txt", "w+") as testout:
-		np.savetxt(testout, traceback_mat, fmt="%d", delimiter=" ")
 
 	# backtrack time
 	alignment_score = np.amax(scoring_mat)
 	xTrace, yTrace = np.unravel_index(np.argmax(scoring_mat, axis=None), scoring_mat.shape)
-	# print("maxs" , (alignment_score, xTrace, yTrace))
-	# print("scoring_mat", scoring_mat[xTrace, yTrace])
 
 	initXTrace = xTrace
 	initYTrace = yTrace
@@ -155,21 +145,6 @@ def runSW(inputFile, outputFile, scoreFile, openGap, extGap):
 			seq_identity = " " + seq_identity
 			yTrace -= 1
 
-	# 	print(trace_max_idx)
-	# 	print("seq1", seq1_align)
-	# 	print("mid1", seq_identity)
-	# 	print("seq2", seq2_align)
-	# 	print("(xTrace, yTrace)", (xTrace, yTrace))
-	# 	print("(scoring_mat[xTrace, yTrace])", scoring_mat[xTrace, yTrace])
-
-	# 	print("\n\n")
-
-	# print("final xtrace", xTrace)
-	# print("final ytrace", yTrace)
-	# print("init xtrace", initXTrace)
-	# print("init ytrace", initYTrace)
-	# print("trace_max_idx", trace_max_idx)
-	# figure out which seq is longer and add in the parantheses
 	seq2_align = "(" + seq2_align + ")"
 	seq1_align = "(" + seq1_align + ")"
 
